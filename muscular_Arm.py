@@ -68,7 +68,7 @@ class muscular_arm():
         #Angles to radians conversion
         self.theta0 = 0.01745*torch.tensor([[15.0, 4.88, 0.00, 0.00, 4.5, 2.12], [0.00, 0.00, 80.86, 109.32, 92.96, 91.52]]).to(device)
         self.L0 = torch.tensor([[7.32, 3.26, 6.4, 4.26, 5.95, 4.04]]).to(device)
-        self.beta = 1#.55
+        self.beta = 1.55
         self.omega = 0.81
         self.rho = 2.12
         self.Vmax = -7.39
