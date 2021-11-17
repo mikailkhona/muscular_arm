@@ -91,7 +91,7 @@ class muscular_arm():
         """
         Takes in muscle layer force inputs
         u (muscle input raw) shape:
-        returns: nothing (Default)
+        returns: nothing (Default), uncomment last line to return (theta,phi,thetadot,phidot)
         updates joint states using muscle output(incorporating length/velocity) -> torque input
         """
 
@@ -110,10 +110,12 @@ class muscular_arm():
         net_command = self.tor
         x = self.armdyn(net_command)
         self.cur_j_state = x
-        self.cur_j_state[:,1] = pi - torch.relu(pi - self.cur_j_state[:,1] )
+        self.cur_j_state[:,1] = pi - torch.relu(pi - self.cur_j_state[:,1])
+        
         #(Optional) compute cartesian-states from joint-states (Run armkinematics)
         #y = self.armkin(x)
-        #return mus_out
+        
+        #return self.cur_j_state
 
     def armdyn(self, u):
         '''
