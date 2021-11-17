@@ -91,8 +91,8 @@ class muscular_arm():
         """
         Takes in muscle layer force inputs
         u (muscle input raw) shape:
-        returns:
-        joint states, muscle output(incorporating length/velocity), torque input
+        returns: nothing (Default)
+        updates joint states using muscle output(incorporating length/velocity) -> torque input
         """
 
         # for linear muscle activation
@@ -117,6 +117,7 @@ class muscular_arm():
 
     def armdyn(self, u):
         '''
+        Helper function, used by step
         Takes in muscle layer torque outputs, updates theta, thetadot 
         return (theta,phi,thetadot,phidot)
         '''
@@ -181,7 +182,7 @@ class muscular_arm():
 
     def get_tipPosition(self):
         '''
-        Updates positions based on theta, thetadot
+        get position/velocity in (x,y,xdot,ydot) coordinates based on theta, thetadot
         '''
         
         theta1 = self.cur_j_state[:, 0].clone().unsqueeze(1)
@@ -225,7 +226,8 @@ class muscular_arm():
     
     def joint_Coords(self):
         '''
-        Draw the current configuration of the arm: In numpy for visualization.
+        Get (x,y) of each joint
+        Used to draw the current configuration of the arm: In numpy for visualization.
         '''
         
         joint_Coords = np.array([[0,0],[arm.l1*np.cos(arm.cur_j_state[0,0].detach().numpy()),
