@@ -31,8 +31,6 @@ This retains the grad_fn during the backprop
 """
 
 import torch
-import matplotlib.pyplot as plt
-import numpy as np
 use_cuda = 'false'
 device = torch.device('cuda:0' if use_cuda else 'cpu')
 device = 'cpu'
@@ -110,8 +108,17 @@ class muscular_arm():
         net_command = self.tor
         x = self.armdyn(net_command)
         self.cur_j_state = x
-        self.cur_j_state[:,1] = pi - torch.relu(pi - self.cur_j_state[:,1])
         
+        #constrain movement of arm to realistic configurations
+        '''
+        Upper bound angles
+        self.cur_j_state[:,1] = pi - torch.relu(pi - self.cur_j_state[:,1])
+        self.cur_j_state[:,1] = self.elbow_ub - torch.relu(self.elbow_ub - self.cur_j_state[:,1])
+        
+         Lower bound angles
+        self.cur_j_state[:,1] = torch.relu(self.cur_j_state[:,1] + 80) - 80
+        self.cur_j_state[:,0] = torch.relu(self.cur_j_state[:,0])
+        '''
         #(Optional) compute cartesian-states from joint-states (Run armkinematics)
         #y = self.armkin(x)
         
@@ -211,10 +218,14 @@ class muscular_arm():
         
         # F-L/V dependency
         mus_l = 1 + self.M[0,:] * (self.theta0[0,:] - self.cur_j_state[:, 0].unsqueeze(1))/self.L0 + self.M[1,:] * (self.theta0[1,:] - self.cur_j_state[:, 1].unsqueeze(1))/self.L0
-
+        mus_l = torch.relu(mus_l)
+        #If any of these are 0, the factor should be 0, otherwise 1
+        if (torch.count_nonzero(mus_l)<6):
+            factor = 0
+        else:
+            factor = 1
         mus_v = self.M[0, :] * self.cur_j_state[:, 2].unsqueeze(1)/self.L0 + self.M[1, :] * self.cur_j_state[:, 3].unsqueeze(1)/self.L0
-
-        FL = torch.exp(-torch.abs((mus_l**self.beta - 1)/self.omega)**self.rho)
+        FL = factor*torch.exp(-torch.abs(((mus_l)**self.beta - 1)/self.omega)**self.rho)
         FV = self.FV.clone()
 
         #loop over number of muscles
@@ -230,7 +241,8 @@ class muscular_arm():
         '''
         Helper function, used by step
         Get (x,y) of each joint
-        Used to draw the current configuration of the arm: In numpy for visualization.
+        Used to draw the current configuration of the arm.
+        In numpy for visualization.
         '''
         
         joint_Coords = np.array([[0,0],[arm.l1*np.cos(arm.cur_j_state[0,0].detach().numpy()),
