@@ -184,7 +184,7 @@ class muscular_arm():
 
     def get_tipPosition(self):
         '''
-        get position/velocity in (x,y,xdot,ydot) coordinates based on theta, thetadot
+        get position/velocity in (x,y,xdot,ydot) coordinates based on (theta, thetadot) joint coordinates
         '''
         
         theta1 = self.cur_j_state[:, 0].clone().unsqueeze(1)
@@ -228,6 +228,7 @@ class muscular_arm():
     
     def joint_Coords(self):
         '''
+        Helper function, used by step
         Get (x,y) of each joint
         Used to draw the current configuration of the arm: In numpy for visualization.
         '''
