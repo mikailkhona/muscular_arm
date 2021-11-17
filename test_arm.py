@@ -15,8 +15,8 @@ thetas = np.zeros((steps,2))
 joint_Coords_init = arm.joint_Coords()
 
 for i in range(0,steps):
-    arm.forward(u)
-    x[i,:] = arm.armkin()[0,0:2].detach().numpy()
+    arm.step(u)
+    x[i,:] = arm.get_tipPosition()[0,0:2].detach().numpy()
     thetas[i,:] = arm.cur_j_state[0,0:2].detach().numpy()
 
 fig, axes = plt.subplots(nrows = 1, ncols = 3,figsize = (4.5,12))
