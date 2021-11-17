@@ -87,7 +87,7 @@ class muscular_arm():
         self.cur_j_state = torch.zeros(batch_size, 4).to(device)
         self.FV = torch.zeros(batch_size, 6).to(device)
 
-    def forward(self, u):
+    def step(self, u):
         """
         Takes in muscle layer force inputs
         u (muscle input raw) shape:
@@ -179,7 +179,7 @@ class muscular_arm():
         # as is demanded by the tensor form in which we wrote our optimization code
         return theta_next
 
-    def armkin(self):
+    def get_tipPosition(self):
         '''
         Updates positions based on theta, thetadot
         '''
