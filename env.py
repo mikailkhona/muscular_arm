@@ -1,12 +1,7 @@
 import math
-
 import torch
-
 from collections import namedtuple
-
 import numpy as np
-
-
 """
 Created on Thu Jul 18 12:25:40 2019
 @author: Hari - hariteja1992@gmail.com
@@ -43,7 +38,7 @@ ArmObs = namedtuple(
 
 class muscular_ArmEnv():
     def __init__(self, batch_size = 1, device = 'cpu', dt = 0.01):
-        super(muscular_arm, self).__init__()
+        super(muscular_ArmEnv, self).__init__()
         self.batch_size = batch_size
 
         # fixed Monkey arm parameters (1=shoulder; 2=elbow) (refer to Lillicrap et al 2013, Li&Todorov2007)
@@ -89,12 +84,15 @@ class muscular_ArmEnv():
         self.dt = dt
         
         self.cur_j_state = torch.zeros(batch_size, 4).to(device)
-	#Initial joint state
-	self.cur_j_state[0,0] = pi*0.15
+        #Initial joint state
+        self.cur_j_state[0,0] = pi*0.15
         self.cur_j_state[0,1] = pi*0.5
         self.FV = torch.zeros(batch_size, 6).to(device)
+        
+        #Center the arm so that the tip is at (0,0) when initialized.
+        self.initposition = torch.tensor([2.6307e-04, 3.1887e-01]).to(device)
+        self.position = self.get_tipPosition()
 
-	self.position = self.get_tipPosition()
 
     def obs(self):
         return ArmObs(self.cur_j_state[0,0:2], self.position[0,0:2])
@@ -213,7 +211,7 @@ class muscular_ArmEnv():
         ydot = theta1_dot*((self.l1*torch.cos(theta1)) + (self.l2*torch.cos(theta1+theta2)))
         ydot = ydot + (theta2_dot*(self.l2*torch.cos(theta1+theta2)))
         
-        phase_space = torch.cat((x,y,xdot,ydot), 1)
+        phase_space = torch.cat((x - self.initposition[0], y - self.initposition[1], xdot, ydot), 1)
         return phase_space
 
     def muscleDyn(self):
@@ -254,6 +252,6 @@ class muscular_ArmEnv():
                                arm.l1*np.sin(arm.cur_j_state[0,0].detach().numpy())],
                         [arm.l1*np.cos(arm.cur_j_state[0,0].detach().numpy()) + arm.l2*np.cos(arm.cur_j_state[0,0].detach().numpy() + arm.cur_j_state[0,1].detach().numpy()),
                                arm.l1*np.sin(arm.cur_j_state[0,0].detach().numpy()) + arm.l2*np.sin(arm.cur_j_state[0,0].detach().numpy() + arm.cur_j_state[0,1].detach().numpy())]])
+        joint_Coords[:,0] = joint_Coords[:,0] - self.initposition[0].detach().numpy()
+        joint_Coords[:,1] = joint_Coords[:,1] - self.initposition[1].detach().numpy()
         return joint_Coords
-
-
