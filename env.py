@@ -89,6 +89,9 @@ class muscular_ArmEnv():
         self.dt = dt
         
         self.cur_j_state = torch.zeros(batch_size, 4).to(device)
+	#Initial joint state
+	self.cur_j_state[0,0] = pi*0.15
+        self.cur_j_state[0,1] = pi*0.5
         self.FV = torch.zeros(batch_size, 6).to(device)
 
 	self.position = self.get_tipPosition()
@@ -121,7 +124,7 @@ class muscular_ArmEnv():
         x = self.armdyn(net_command)
         self.cur_j_state = x
 
-        self.position = self.get_tipPosition(x)
+        self.position = self.get_tipPosition()
         
         return self.obs()
 
