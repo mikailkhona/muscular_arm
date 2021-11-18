@@ -85,12 +85,14 @@ class muscular_ArmEnv():
         
         self.cur_j_state = torch.zeros(batch_size, 4).to(device)
         #Initial joint state
-        self.cur_j_state[0,0] = pi*0.15
-        self.cur_j_state[0,1] = pi*0.5
+
+        self.cur_j_state[0,0] = 0.05*pi
+        self.cur_j_state[0,1] = 0.6*pi
         self.FV = torch.zeros(batch_size, 6).to(device)
         
         #Center the arm so that the tip is at (0,0) when initialized.
-        self.initposition = torch.tensor([2.6307e-04, 3.1887e-01]).to(device)
+        self.initposition = torch.tensor([0.0143, 0.2757]).to(device)
+        #self.initposition = torch.tensor([0,0]).to(device)
         self.position = self.get_tipPosition()
 
 
