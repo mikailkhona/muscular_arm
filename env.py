@@ -94,7 +94,7 @@ class muscular_ArmEnv():
 	self.position = self.get_tipPosition()
 
     def obs(self):
-        return ArmObs(self.cur_j_state[0,:], self.position[0,:])
+        return ArmObs(self.cur_j_state[0,0:2], self.position[0,0:2])
 
     def step(self, u):
         """
