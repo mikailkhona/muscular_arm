@@ -112,7 +112,8 @@ class muscular_ArmEnv():
         # for non-linear muscle activation - add F-L/V property contribution
         fl_out, fv_out = self.muscleDyn()
         flv_computed = fl_out * fv_out
-        mus_out = fl_out * fv_out * mus_inp
+        #mus_out = fl_out * fv_out * mus_inp
+        mus_out=torch.ones([1,6])*mus_inp
 
         #muscle-force to joint-torque transformation (using M)
         self.tor = torch.mm(self.M, mus_out.transpose(0,1))
